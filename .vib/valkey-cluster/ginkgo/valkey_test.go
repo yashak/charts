@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	utils "github.com/bitnami/charts/.vib/common-tests/ginkgo-utils"
+	utils "github.com/bitnami/charts-private/.vib/common-tests/ginkgo-utils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/core/v1"

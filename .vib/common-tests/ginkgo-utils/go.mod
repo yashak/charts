@@ -1,4 +1,4 @@
-module github.com/bitnami/charts/.vib/common-tests/ginkgo-utils
+module github.com/bitnami/charts-private/.vib/common-tests/ginkgo-utils
 
 go 1.23.0
 

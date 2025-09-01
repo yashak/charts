@@ -4,10 +4,10 @@ go 1.23.0
 
 toolchain go1.24.1
 
-replace github.com/bitnami/charts/.vib/common-tests/ginkgo-utils => ../../common-tests/ginkgo-utils
+replace github.com/bitnami/charts-private/.vib/common-tests/ginkgo-utils => ../../common-tests/ginkgo-utils
 
 require (
-	github.com/bitnami/charts/.vib/common-tests/ginkgo-utils v0.0.0-00010101000000-000000000000
+	github.com/bitnami/charts-private/.vib/common-tests/ginkgo-utils v0.0.0-00010101000000-000000000000
 	github.com/onsi/ginkgo/v2 v2.23.3
 	github.com/onsi/gomega v1.36.2
 	k8s.io/api v0.28.0
