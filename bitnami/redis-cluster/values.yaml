@@ -87,8 +87,8 @@ diagnosticMode:
 ## @param image.debug Enable image debug mode
 ##
 image:
-  registry: docker.io
-  repository: bitnami/redis-cluster
+  registry: registry.app-catalog.vmware.com
+  repository: eam/prd/containers/verified/common/minideb-bookworm/redis-cluster
   tag: 8.2.1-debian-12-r0
   digest: ""
   ## Specify a imagePullPolicy
@@ -440,8 +440,8 @@ volumePermissions:
   ## @param volumePermissions.image.pullSecrets Specify docker-registry secret names as an array
   ##
   image:
-    registry: docker.io
-    repository: bitnami/os-shell
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/os-shell
     tag: 12-debian-12-r51
     digest: ""
     pullPolicy: IfNotPresent
@@ -945,8 +945,8 @@ metrics:
   ## @param metrics.image.pullSecrets Specify docker-registry secret names as an array
   ##
   image:
-    registry: docker.io
-    repository: bitnami/redis-exporter
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/redis-exporter
     tag: 1.76.0-debian-12-r0
     digest: ""
     pullPolicy: IfNotPresent
@@ -1156,8 +1156,8 @@ sysctlImage:
   ## @param sysctlImage.pullPolicy sysctlImage Init container pull policy
   ## @param sysctlImage.pullSecrets Specify docker-registry secret names as an array
   ##
-  registry: docker.io
-  repository: bitnami/os-shell
+  registry: registry.app-catalog.vmware.com
+  repository: eam/prd/containers/verified/common/minideb-bookworm/os-shell
   tag: 12-debian-12-r51
   digest: ""
   pullPolicy: IfNotPresent
