@@ -99,8 +99,8 @@ kustomizeController:
   ## @param kustomizeController.image.debug Enable Kustomize Controller image debug mode
   ##
   image:
-    registry: docker.io
-    repository: bitnami/fluxcd-kustomize-controller
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/fluxcd-kustomize-controller
     tag: 1.6.1-debian-12-r5
     digest: ""
     ## Specify a imagePullPolicy
@@ -613,8 +613,8 @@ helmController:
   ## @param helmController.image.debug Enable Helm Controller image debug mode
   ##
   image:
-    registry: docker.io
-    repository: bitnami/fluxcd-helm-controller
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/fluxcd-helm-controller
     tag: 1.3.0-debian-12-r9
     digest: ""
     ## Specify a imagePullPolicy
@@ -1127,8 +1127,8 @@ sourceController:
   ## @param sourceController.image.debug Enable Source Controller image debug mode
   ##
   image:
-    registry: docker.io
-    repository: bitnami/fluxcd-source-controller
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/fluxcd-source-controller
     tag: 1.6.2-debian-12-r6
     digest: ""
     ## Specify a imagePullPolicy
@@ -1740,8 +1740,8 @@ notificationController:
   ## @param notificationController.image.debug Enable Notification Controller image debug mode
   ##
   image:
-    registry: docker.io
-    repository: bitnami/fluxcd-notification-controller
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/fluxcd-notification-controller
     tag: 1.6.0-debian-12-r8
     digest: ""
     ## Specify a imagePullPolicy
@@ -2366,8 +2366,8 @@ imageAutomationController:
   ## @param imageAutomationController.image.debug Enable Image Automation Controller image debug mode
   ##
   image:
-    registry: docker.io
-    repository: bitnami/fluxcd-image-automation-controller
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/fluxcd-image-automation-controller
     tag: 0.41.2-debian-12-r4
     digest: ""
     ## Specify a imagePullPolicy
@@ -2880,8 +2880,8 @@ imageReflectorController:
   ## @param imageReflectorController.image.debug Enable Image Reflector Controller image debug mode
   ##
   image:
-    registry: docker.io
-    repository: bitnami/fluxcd-image-reflector-controller
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/fluxcd-image-reflector-controller
     tag: 0.35.2-debian-12-r4
     digest: ""
     ## Specify a imagePullPolicy
@@ -3431,9 +3431,9 @@ volumePermissions:
   ## @param volumePermissions.image.pullSecrets OS Shell + Utility image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: bitnami/os-shell
-    tag: 12-debian-12-r50
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/os-shell
+    tag: 12-debian-12-r51
     digest: ""
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
