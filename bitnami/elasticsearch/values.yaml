@@ -207,9 +207,9 @@ useIstioLabels: true
 ## @param image.debug Enable Elasticsearch image debug mode
 ##
 image:
-  registry: docker.io
-  repository: bitnami/elasticsearch
-  tag: 9.1.2-debian-12-r0
+  registry: registry.app-catalog.vmware.com
+  repository: eam/prd/containers/verified/common/minideb-bookworm/elasticsearch
+  tag: 9.1.3-debian-12-r0
   digest: ""
   ## Specify a imagePullPolicy
   ## ref: http://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -2216,8 +2216,8 @@ metrics:
   ## @param metrics.image.pullSecrets Metrics exporter image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: bitnami/elasticsearch-exporter
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/elasticsearch-exporter
     tag: 1.9.0-debian-12-r16
     digest: ""
     pullPolicy: IfNotPresent
@@ -2646,9 +2646,9 @@ volumePermissions:
   ## @param volumePermissions.image.pullSecrets Init container volume-permissions image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: bitnami/os-shell
-    tag: 12-debian-12-r50
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/os-shell
+    tag: 12-debian-12-r51
     digest: ""
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
@@ -2693,9 +2693,9 @@ sysctlImage:
   ## @param sysctlImage.pullPolicy Kernel settings modifier image pull policy
   ## @param sysctlImage.pullSecrets Kernel settings modifier image pull secrets
   ##
-  registry: docker.io
-  repository: bitnami/os-shell
-  tag: 12-debian-12-r50
+  registry: registry.app-catalog.vmware.com
+  repository: eam/prd/containers/verified/common/minideb-bookworm/os-shell
+  tag: 12-debian-12-r51
   digest: ""
   ## Specify a imagePullPolicy
   ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
