@@ -1,0 +1,43 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if .Values.queryFrontend.autoscaling.hpa.enabled }}
+apiVersion: {{ include "common.capabilities.hpa.apiVersion" ( dict "context" $ ) }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "grafana-pyroscope.query-frontend.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: query-frontend
+  {{- if or .Values.commonAnnotations .Values.queryFrontend.autoscaling.hpa.annotations }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.queryFrontend.autoscaling.hpa.annotations .Values.commonAnnotations ) "context" . ) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+    kind: Deployment
+    name: {{ template "grafana-pyroscope.query-frontend.fullname" . }}
+  minReplicas: {{ .Values.queryFrontend.autoscaling.hpa.minReplicas }}
+  maxReplicas: {{ .Values.queryFrontend.autoscaling.hpa.maxReplicas }}
+  metrics:
+    {{- if .Values.queryFrontend.autoscaling.hpa.targetCPU }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.queryFrontend.autoscaling.hpa.targetCPU }}
+    {{- end }}
+    {{- if .Values.queryFrontend.autoscaling.hpa.targetMemory }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.queryFrontend.autoscaling.hpa.targetMemory }}
+    {{- end }}
+{{- end }}

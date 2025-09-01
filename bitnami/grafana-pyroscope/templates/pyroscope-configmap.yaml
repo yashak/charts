@@ -1,0 +1,55 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{/* Adding the helper in configmap.yaml for better readability */}}
+{{- define "grafana-pyroscope.config.default" -}}
+{{- if or .Values.minio.enabled .Values.externalS3.host }}
+storage:
+  backend: s3
+  s3:
+    endpoint: {{ printf "%s:%v" (include "grafana-pyroscope.s3.host" .) (include "grafana-pyroscope.s3.port" .) | quote }}
+    bucket_name: {{ include "grafana-pyroscope.s3.bucket" . | quote }}
+    insecure: {{ include "grafana-pyroscope.s3.insecure" . }}
+{{- end }}
+memberlist:
+  cluster_label: {{ printf "%s-%s" (include "common.names.namespace" .) (include "common.names.fullname" .) | quote }}
+  join_members:
+    - {{ include "grafana-pyroscope.gossip-ring.fullname" . | quote }}
+  advertise_port: {{ .Values.pyroscope.containerPorts.gossipRing }}
+server:
+  http_listen_port: {{ .Values.pyroscope.containerPorts.http }}
+  grpc_listen_port: {{ .Values.pyroscope.containerPorts.grpc }}
+compactor:
+  data_dir: {{ printf "%s/compactor" .Values.pyroscope.dataDir | quote }}
+pyroscopedb:
+  data_path: {{  printf "%s/pyroscopedb" .Values.pyroscope.dataDir | quote }}
+self_profiling:
+  disable_push: false
+{{- if .Values.pyroscope.image.debug }}
+log_level: debug
+{{- end }}
+{{- end }}
+
+{{- if not .Values.pyroscope.existingConfigmap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "common.names.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: pyroscope
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  {{- $defaultConfiguration := include "grafana-pyroscope.config.default" . | fromYaml -}}
+  {{- $overrideConfiguration := include "common.tplvalues.render" (dict "value" .Values.pyroscope.overrideConfiguration "context" $) | fromYaml -}}
+
+  {{/* Merge both maps and render the list of env vars */}}
+
+  pyroscope.yaml: |-
+    {{- mergeOverwrite $defaultConfiguration $overrideConfiguration | toYaml | nindent 4 }}
+{{- end }}

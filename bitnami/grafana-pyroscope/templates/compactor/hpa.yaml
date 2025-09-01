@@ -1,0 +1,43 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if and .Values.compactor.enabled .Values.compactor.autoscaling.hpa.enabled }}
+apiVersion: {{ include "common.capabilities.hpa.apiVersion" ( dict "context" $ ) }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "grafana-pyroscope.compactor.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: compactor
+  {{- if or .Values.commonAnnotations .Values.compactor.autoscaling.hpa.annotations }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.compactor.autoscaling.hpa.annotations .Values.commonAnnotations ) "context" . ) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+    kind: StatefulSet
+    name: {{ template "grafana-pyroscope.compactor.fullname" . }}
+  minReplicas: {{ .Values.compactor.autoscaling.hpa.minReplicas }}
+  maxReplicas: {{ .Values.compactor.autoscaling.hpa.maxReplicas }}
+  metrics:
+    {{- if .Values.compactor.autoscaling.hpa.targetCPU }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.compactor.autoscaling.hpa.targetCPU }}
+    {{- end }}
+    {{- if .Values.compactor.autoscaling.hpa.targetMemory }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.compactor.autoscaling.hpa.targetMemory }}
+    {{- end }}
+{{- end }}

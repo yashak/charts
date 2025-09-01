@@ -1,0 +1,69 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if .Values.tenantSettings.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "grafana-pyroscope.tenant-settings.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: tenant-settings
+  {{- if or .Values.commonAnnotations .Values.tenantSettings.service.annotations .Values.metrics.enabled }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.tenantSettings.service.annotations .Values.commonAnnotations ) "context" . ) }}
+  {{- if .Values.metrics.enabled }}
+    {{- $defaultMetricsAnnotations := dict "prometheus.io/scrape" "true" "prometheus.io/port" (.Values.tenantSettings.service.ports.http | toString) "prometheus.io/path" "/metrics" }}
+    {{- $annotations = include "common.tplvalues.merge" (dict "values" (list $annotations $defaultMetricsAnnotations) "context" .) }}
+  {{- end }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.tenantSettings.service.type }}
+  {{- if .Values.tenantSettings.service.sessionAffinity }}
+  sessionAffinity: {{ .Values.tenantSettings.service.sessionAffinity }}
+  {{- end }}
+  {{- if .Values.tenantSettings.service.sessionAffinityConfig }}
+  sessionAffinityConfig: {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.service.sessionAffinityConfig "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.tenantSettings.service.clusterIP }}
+  clusterIP: {{ .Values.tenantSettings.service.clusterIP }}
+  {{- end }}
+  {{- if (or (eq .Values.tenantSettings.service.type "LoadBalancer") (eq .Values.tenantSettings.service.type "NodePort")) }}
+  externalTrafficPolicy: {{ .Values.tenantSettings.service.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{ if eq .Values.tenantSettings.service.type "LoadBalancer" }}
+  loadBalancerSourceRanges: {{ .Values.tenantSettings.service.loadBalancerSourceRanges }}
+  {{ end }}
+  {{- if (and (eq .Values.tenantSettings.service.type "LoadBalancer") (not (empty .Values.tenantSettings.service.loadBalancerIP))) }}
+  loadBalancerIP: {{ .Values.tenantSettings.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: http
+      port: {{ .Values.tenantSettings.service.ports.http }}
+      targetPort: http
+      protocol: TCP
+      {{- if (and (or (eq .Values.tenantSettings.service.type "NodePort") (eq .Values.tenantSettings.service.type "LoadBalancer")) (not (empty .Values.tenantSettings.service.nodePorts.http))) }}
+      nodePort: {{ .Values.tenantSettings.service.nodePorts.http }}
+      {{- else if eq .Values.tenantSettings.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    - name: grpc
+      port: {{ .Values.tenantSettings.service.ports.grpc }}
+      targetPort: grpc
+      protocol: TCP
+      {{- if (and (or (eq .Values.tenantSettings.service.type "NodePort") (eq .Values.tenantSettings.service.type "LoadBalancer")) (not (empty .Values.tenantSettings.service.nodePorts.grpc))) }}
+      nodePort: {{ .Values.tenantSettings.service.nodePorts.grpc }}
+      {{- else if eq .Values.tenantSettings.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .Values.tenantSettings.service.extraPorts }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.service.extraPorts "context" $) | nindent 4 }}
+    {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.tenantSettings.podLabels .Values.commonLabels ) "context" . ) }}
+  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: tenant-settings
+{{- end }}

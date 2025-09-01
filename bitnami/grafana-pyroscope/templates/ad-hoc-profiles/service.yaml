@@ -1,0 +1,69 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if .Values.storeGateway.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "grafana-pyroscope.ad-hoc-profiles.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: ad-hoc-profiles
+  {{- if or .Values.commonAnnotations .Values.adhocProfiles.service.annotations .Values.metrics.enabled }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.adhocProfiles.service.annotations .Values.commonAnnotations ) "context" . ) }}
+  {{- if .Values.metrics.enabled }}
+    {{- $defaultMetricsAnnotations := dict "prometheus.io/scrape" "true" "prometheus.io/port" (.Values.adhocProfiles.service.ports.http | toString) "prometheus.io/path" "/metrics" }}
+    {{- $annotations = include "common.tplvalues.merge" (dict "values" (list $annotations $defaultMetricsAnnotations) "context" .) }}
+  {{- end }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.adhocProfiles.service.type }}
+  {{- if .Values.adhocProfiles.service.sessionAffinity }}
+  sessionAffinity: {{ .Values.adhocProfiles.service.sessionAffinity }}
+  {{- end }}
+  {{- if .Values.adhocProfiles.service.sessionAffinityConfig }}
+  sessionAffinityConfig: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.service.sessionAffinityConfig "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.adhocProfiles.service.clusterIP }}
+  clusterIP: {{ .Values.adhocProfiles.service.clusterIP }}
+  {{- end }}
+  {{- if (or (eq .Values.adhocProfiles.service.type "LoadBalancer") (eq .Values.adhocProfiles.service.type "NodePort")) }}
+  externalTrafficPolicy: {{ .Values.adhocProfiles.service.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{ if eq .Values.adhocProfiles.service.type "LoadBalancer" }}
+  loadBalancerSourceRanges: {{ .Values.adhocProfiles.service.loadBalancerSourceRanges }}
+  {{ end }}
+  {{- if (and (eq .Values.adhocProfiles.service.type "LoadBalancer") (not (empty .Values.adhocProfiles.service.loadBalancerIP))) }}
+  loadBalancerIP: {{ .Values.adhocProfiles.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: http
+      port: {{ .Values.adhocProfiles.service.ports.http }}
+      targetPort: http
+      protocol: TCP
+      {{- if (and (or (eq .Values.adhocProfiles.service.type "NodePort") (eq .Values.adhocProfiles.service.type "LoadBalancer")) (not (empty .Values.adhocProfiles.service.nodePorts.http))) }}
+      nodePort: {{ .Values.adhocProfiles.service.nodePorts.http }}
+      {{- else if eq .Values.adhocProfiles.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    - name: grpc
+      port: {{ .Values.adhocProfiles.service.ports.grpc }}
+      protocol: TCP
+      targetPort: grpc
+      {{- if (and (or (eq .Values.adhocProfiles.service.type "NodePort") (eq .Values.adhocProfiles.service.type "LoadBalancer")) (not (empty .Values.adhocProfiles.service.nodePorts.grpc))) }}
+      nodePort: {{ .Values.adhocProfiles.service.nodePorts.grpc }}
+      {{- else if eq .Values.adhocProfiles.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .Values.adhocProfiles.service.extraPorts }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.service.extraPorts "context" $) | nindent 4 }}
+    {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.adhocProfiles.podLabels .Values.commonLabels ) "context" . ) }}
+  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: ad-hoc-profiles
+{{- end }}

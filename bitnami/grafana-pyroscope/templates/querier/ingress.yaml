@@ -1,0 +1,54 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if .Values.querier.ingress.enabled }}
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ include "grafana-pyroscope.querier.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: querier
+  {{- if or .Values.querier.ingress.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.querier.ingress.annotations .Values.commonAnnotations ) "context" . ) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.querier.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.querier.ingress.ingressClassName | quote }}
+  {{- end }}
+  rules:
+    {{- if .Values.querier.ingress.hostname }}
+    - host: {{ tpl .Values.querier.ingress.hostname . | quote }}
+      http:
+        paths:
+          {{- if .Values.querier.ingress.extraPaths }}
+          {{- toYaml .Values.querier.ingress.extraPaths | nindent 10 }}
+          {{- end }}
+          - path: {{ .Values.querier.ingress.path }}
+            pathType: {{ .Values.querier.ingress.pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "grafana-pyroscope.querier.fullname" .) "servicePort" "http" "context" $)  | nindent 14 }}
+    {{- end }}
+    {{- range .Values.querier.ingress.extraHosts }}
+    - host: {{ .name | quote }}
+      http:
+        paths:
+          - path: {{ default "/" .path }}
+            pathType: {{ default "ImplementationSpecific" .pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "grafana-pyroscope.querier.fullname" $) "servicePort" "http" "context" $) | nindent 14 }}
+    {{- end }}
+  {{- if or (and .Values.querier.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.querier.ingress.annotations )) .Values.querier.ingress.selfSigned)) .Values.querier.ingress.extraTls }}
+  tls:
+    {{- if and .Values.querier.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.querier.ingress.annotations )) .Values.querier.ingress.selfSigned) }}
+    - hosts:
+        - {{ tpl .Values.querier.ingress.hostname . | quote }}
+      secretName: {{ printf "%s-tls" (tpl .Values.querier.ingress.hostname .) }}
+    {{- end }}
+    {{- if .Values.querier.ingress.extraTls }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.querier.ingress.extraTls "context" $) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}

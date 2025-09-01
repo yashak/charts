@@ -1,0 +1,95 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if and .Values.adhocProfiles.enabled .Values.adhocProfiles.networkPolicy.enabled }}
+kind: NetworkPolicy
+apiVersion: {{ include "common.capabilities.networkPolicy.apiVersion" . }}
+metadata:
+  name: {{ template "grafana-pyroscope.ad-hoc-profiles.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: ad-hoc-profiles
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.adhocProfiles.podLabels .Values.commonLabels ) "context" . ) }}
+  podSelector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/part-of: grafana-pyroscope
+      app.kubernetes.io/component: ad-hoc-profiles
+  policyTypes:
+    - Ingress
+    - Egress
+  {{- if .Values.adhocProfiles.networkPolicy.allowExternalEgress }}
+  egress:
+    - {}
+  {{- else }}
+  egress:
+    # Allow dns resolution
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # Allow outbound connections to pyroscope cluster
+    - ports:
+        - port: {{ .Values.pyroscope.containerPorts.http }}
+        - port: {{ .Values.pyroscope.containerPorts.gossipRing }}
+        - port: {{ .Values.pyroscope.containerPorts.grpc }}
+      to:
+        - podSelector:
+            matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 14 }}
+              app.kubernetes.io/part-of: grafana-pyroscope
+    {{- if and .Values.minio.enabled .Values.externalS3.host }}
+    # Allow outbound connections to S3
+    - ports:
+        - port: {{ include "grafana-pyroscope.s3.port" . }}
+      {{- if .Values.minio.enabled }}
+        - port: {{ .Values.minio.containerPorts.api }}
+      to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: minio
+              app.kubernetes.io/instance: {{ include "common.names.namespace" . }}
+        {{- end }}
+    {{- end }}
+    {{- if .Values.adhocProfiles.networkPolicy.extraEgress }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.adhocProfiles.networkPolicy.extraEgress "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+  ingress:
+    - ports:
+        - port: {{ .Values.pyroscope.containerPorts.http }}
+        - port: {{ .Values.pyroscope.containerPorts.gossipRing }}
+        - port: {{ .Values.pyroscope.containerPorts.grpc }}
+      {{- if not .Values.adhocProfiles.networkPolicy.allowExternal }}
+      from:
+        - podSelector:
+            matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 14 }}
+              app.kubernetes.io/part-of: grafana-pyroscope
+        {{- if .Values.adhocProfiles.networkPolicy.addExternalClientAccess }}
+        - podSelector:
+            matchLabels:
+              {{ template "grafana-pyroscope.ad-hoc-profiles.fullname" . }}-client: "true"
+        {{- end }}
+        {{- if .Values.adhocProfiles.networkPolicy.ingressPodMatchLabels }}
+        - podSelector:
+            matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.networkPolicy.ingressPodMatchLabels "context" $ ) | nindent 14 }}
+        {{- end }}
+        {{- if .Values.adhocProfiles.networkPolicy.ingressNSMatchLabels }}
+        - namespaceSelector:
+            matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.networkPolicy.ingressNSMatchLabels "context" $ ) | nindent 14 }}
+          {{- if .Values.adhocProfiles.networkPolicy.ingressNSPodMatchLabels }}
+          podSelector:
+            matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.networkPolicy.ingressNSPodMatchLabels "context" $ ) | nindent 14 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- if .Values.adhocProfiles.networkPolicy.extraIngress }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.adhocProfiles.networkPolicy.extraIngress "context" $ ) | nindent 4 }}
+    {{- end }}
+{{- end }}

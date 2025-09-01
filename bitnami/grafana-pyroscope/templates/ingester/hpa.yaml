@@ -1,0 +1,43 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if .Values.ingester.autoscaling.hpa.enabled }}
+apiVersion: {{ include "common.capabilities.hpa.apiVersion" ( dict "context" $ ) }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "grafana-pyroscope.ingester.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: ingester
+  {{- if or .Values.commonAnnotations .Values.ingester.autoscaling.hpa.annotations }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.ingester.autoscaling.hpa.annotations .Values.commonAnnotations ) "context" . ) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+    kind: StatefulSet
+    name: {{ template "grafana-pyroscope.ingester.fullname" . }}
+  minReplicas: {{ .Values.ingester.autoscaling.hpa.minReplicas }}
+  maxReplicas: {{ .Values.ingester.autoscaling.hpa.maxReplicas }}
+  metrics:
+    {{- if .Values.ingester.autoscaling.hpa.targetCPU }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.ingester.autoscaling.hpa.targetCPU }}
+    {{- end }}
+    {{- if .Values.ingester.autoscaling.hpa.targetMemory }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.ingester.autoscaling.hpa.targetMemory }}
+    {{- end }}
+{{- end }}

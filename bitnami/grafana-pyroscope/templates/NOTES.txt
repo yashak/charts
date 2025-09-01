@@ -1,0 +1,59 @@
+CHART NAME: {{ .Chart.Name }}
+CHART VERSION: {{ .Chart.Version }}
+APP VERSION: {{ .Chart.AppVersion }}
+
+** Please be patient while the chart is being deployed **
+
+Installed components:
+
+  * ingester
+  * distributor
+  * querier
+  * query-frontend
+  {{- if .Values.grafanaalloy.enabled }}
+  * alloy
+  {{- end }}
+  {{- if .Values.compactor.enabled }}
+  * compactor
+  {{- end }}
+  {{- if .Values.storeGateway.enabled }}
+  * store-gateway
+  {{- end }}
+  {{- if .Values.tenantSettings.enabled }}
+  * tenant-settings
+  {{- end }}
+  {{- if .Values.adhocProfiles.enabled }}
+  * ad-hoc-profiles
+  {{- end }}
+
+{{- if .Values.querier.ingress.enabled }}
+
+1. Get the query-frontend URL and associate the hostname to your cluster external IP:
+
+   export CLUSTER_IP=$(minikube ip) # On Minikube. Use: `kubectl cluster-info` on others K8s clusters
+   echo "Query Frontend URL: http{{ if .Values.querier.ingress.tls }}s{{ end }}://{{ .Values.querier.ingress.hostname }}/"
+   echo "$CLUSTER_IP  {{ .Values.querier.ingress.hostname }}" | sudo tee -a /etc/hosts
+
+{{- else }}
+1. Get the query-frontend URL by running these commands:
+
+{{- if contains "NodePort" .Values.queryFrontend.service.type }}
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "grafana-pyroscope.query-frontend.fullname" . }})
+    export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.queryFrontend.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ template "common.names.fullname" . }}
+    export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "common.names.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+    echo http://$SERVICE_IP:{{ .Values.queryFrontend.service.ports.http }}
+{{- else if contains "ClusterIP" .Values.queryFrontend.service.type }}
+    echo "The Query Frontend is available at http://127.0.0.1:{{ .Values.queryFrontend.service.ports.http }}"
+    kubectl port-forward svc/{{ template "grafana-pyroscope.query-frontend.fullname" . }} {{ .Values.queryFrontend.service.ports.http }}:{{ .Values.queryFrontend.service.ports.http }} &
+{{- end }}
+{{- end }}
+
+{{- include "grafana-pyroscope.checkRollingTags" . }}
+{{- include "grafana-pyroscope.validateValues" . }}
+{{- include "common.warnings.resources" (dict "sections" (list "compactor" "distributor"  "storeGateway" "ingester" "querier" "queryFrontend" "queryScheduler" "tenantSettings" "adhocProfiles" "defaultInitContainers.volumePermissions") "context" $) }}
+{{- include "common.warnings.modifiedImages" (dict "images" (list .Values.pyroscope.image .Values.defaultInitContainers.volumePermissions.image) "context" $) }}
+{{- include "common.errors.insecureImages" (dict "images" (list .Values.pyroscope.image .Values.defaultInitContainers.volumePermissions.image) "context" $) }}

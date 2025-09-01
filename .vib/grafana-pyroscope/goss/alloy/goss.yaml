@@ -1,0 +1,92 @@
+# Copyright Broadcom, Inc. All Rights Reserved.
+# SPDX-License-Identifier: APACHE-2.0
+
+http:
+  http://grafana-pyroscope-ad-hoc-profiles:{{ .Vars.adhocProfiles.service.ports.http }}/ready:
+    status: 200
+  http://grafana-pyroscope-ad-hoc-profiles:{{ .Vars.adhocProfiles.service.ports.http }}/metrics:
+    status: 200
+    body:
+      - pyroscope_request_duration_seconds_sum
+  http://grafana-pyroscope-compactor:{{ .Vars.compactor.service.ports.http }}/ready:
+    status: 200
+  http://grafana-pyroscope-compactor:{{ .Vars.compactor.service.ports.http }}/metrics:
+    status: 200
+    body:
+      - pyroscope_request_duration_seconds_sum
+  http://grafana-pyroscope-distributor:{{ .Vars.distributor.service.ports.http }}/ready:
+    status: 200
+  http://grafana-pyroscope-distributor:{{ .Vars.distributor.service.ports.http }}/metrics:
+    status: 200
+    body:
+      - pyroscope_request_duration_seconds_sum
+  http://grafana-pyroscope-ingester:{{ .Vars.ingester.service.ports.http }}/ready:
+    status: 200
+  http://grafana-pyroscope-ingester:{{ .Vars.ingester.service.ports.http }}/metrics:
+    status: 200
+    body:
+      - pyroscope_request_duration_seconds_sum
+  http://grafana-pyroscope-querier:{{ .Vars.querier.service.ports.http }}/ready:
+    status: 200
+  http://grafana-pyroscope-querier:{{ .Vars.querier.service.ports.http }}/metrics:
+    status: 200
+    body:
+      - pyroscope_request_duration_seconds_sum
+  http://grafana-pyroscope-query-frontend:{{ .Vars.queryFrontend.service.ports.http }}/ready:
+    status: 200
+  http://grafana-pyroscope-query-frontend:{{ .Vars.queryFrontend.service.ports.http }}/metrics:
+    status: 200
+    body:
+      - pyroscope_request_duration_seconds_sum
+  http://grafana-pyroscope-query-scheduler:{{ .Vars.queryScheduler.service.ports.http }}/ready:
+    status: 200
+  http://grafana-pyroscope-query-scheduler:{{ .Vars.queryScheduler.service.ports.http }}/metrics:
+    status: 200
+    body:
+      - pyroscope_request_duration_seconds_sum
+  http://grafana-pyroscope-store-gateway:{{ .Vars.storeGateway.service.ports.http }}/ready:
+    status: 200
+  http://grafana-pyroscope-store-gateway:{{ .Vars.storeGateway.service.ports.http }}/metrics:
+    status: 200
+    body:
+      - pyroscope_request_duration_seconds_sum
+  http://grafana-pyroscope-tenant-settings:{{ .Vars.tenantSettings.service.ports.http }}/ready:
+    status: 200
+  http://grafana-pyroscope-tenant-settings:{{ .Vars.tenantSettings.service.ports.http }}/metrics:
+    status: 200
+    body:
+      - pyroscope_request_duration_seconds_sum
+addr:
+  tcp://grafana-pyroscope-ad-hoc-profiles:{{ .Vars.adhocProfiles.service.ports.grpc }}:
+    reachable: true
+    timeout: 2000
+  tcp://grafana-pyroscope-compactor:{{ .Vars.compactor.service.ports.grpc }}:
+    reachable: true
+    timeout: 2000
+  tcp://grafana-pyroscope-distributor:{{ .Vars.distributor.service.ports.grpc }}:
+    reachable: true
+    timeout: 2000
+  tcp://grafana-pyroscope-ingester:{{ .Vars.ingester.service.ports.grpc }}:
+    reachable: true
+    timeout: 2000
+  tcp://grafana-pyroscope-querier:{{ .Vars.querier.service.ports.grpc }}:
+    reachable: true
+    timeout: 2000
+  tcp://grafana-pyroscope-query-frontend:{{ .Vars.queryFrontend.service.ports.grpc }}:
+    reachable: true
+    timeout: 2000
+  tcp://grafana-pyroscope-query-scheduler:{{ .Vars.queryScheduler.service.ports.grpc }}:
+    reachable: true
+    timeout: 2000
+  tcp://grafana-pyroscope-store-gateway:{{ .Vars.storeGateway.service.ports.grpc }}:
+    reachable: true
+    timeout: 2000
+  tcp://grafana-pyroscope-tenant-settings:{{ .Vars.tenantSettings.service.ports.grpc }}:
+    reachable: true
+    timeout: 2000
+file:
+  /opt/bitnami/grafana-alloy/config/config.alloy:
+    exists: true
+    filetype: symlink
+    contents:
+    - 'http://grafana-pyroscope-distributor'

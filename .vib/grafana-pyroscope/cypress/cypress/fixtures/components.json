@@ -1,0 +1,3 @@
+{
+  "components": ["compactor", "distributor", "ingester", "querier", "query-frontend", "query-scheduler", "store-gateway"]
+}

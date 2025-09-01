@@ -1,0 +1,195 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if .Values.adhocProfiles.enabled }}
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "grafana-pyroscope.ad-hoc-profiles.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: ad-hoc-profiles
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if not .Values.adhocProfiles.autoscaling.hpa.enabled }}
+  replicas: {{ .Values.adhocProfiles.replicaCount }}
+  {{- end }}
+  {{- if .Values.adhocProfiles.updateStrategy }}
+  strategy: {{- toYaml .Values.adhocProfiles.updateStrategy | nindent 4 }}
+  {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.adhocProfiles.podLabels .Values.commonLabels ) "context" . ) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/part-of: grafana-pyroscope
+      app.kubernetes.io/component: ad-hoc-profiles
+  template:
+    metadata:
+      annotations:
+        {{- if not .Values.pyroscope.existingConfigmap }}
+        checksum/config: {{ include (print $.Template.BasePath "/pyroscope-configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.pyroscope.addProfileAnnotations }}
+        {{- include "grafana-pyroscope.profileAnnotations" . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.adhocProfiles.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/part-of: grafana-pyroscope
+        app.kubernetes.io/component: ad-hoc-profiles
+        pyroscope-gossip-member: "true"
+    spec:
+      serviceAccountName: {{ template "grafana-pyroscope.serviceAccountName" . }}
+      {{- include "grafana-pyroscope.imagePullSecrets" . | nindent 6 }}
+      automountServiceAccountToken: {{ .Values.adhocProfiles.automountServiceAccountToken }}
+      {{- if .Values.adhocProfiles.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.adhocProfiles.affinity }}
+      affinity: {{- include "common.tplvalues.render" ( dict "value" .Values.adhocProfiles.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.adhocProfiles.podAffinityPreset "component" "ad-hoc-profiles" "customLabels" $podLabels "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.adhocProfiles.podAntiAffinityPreset "component" "ad-hoc-profiles" "customLabels" $podLabels "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.adhocProfiles.nodeAffinityPreset.type "key" .Values.adhocProfiles.nodeAffinityPreset.key "values" .Values.adhocProfiles.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.adhocProfiles.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" ( dict "value" .Values.adhocProfiles.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.adhocProfiles.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.tolerations "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.adhocProfiles.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.adhocProfiles.priorityClassName }}
+      priorityClassName: {{ .Values.adhocProfiles.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.adhocProfiles.schedulerName }}
+      schedulerName: {{ .Values.adhocProfiles.schedulerName }}
+      {{- end }}
+      {{- if .Values.adhocProfiles.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.adhocProfiles.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      enableServiceLinks: {{ .Values.adhocProfiles.enableServiceLinks }}
+      initContainers:
+        {{- if .Values.adhocProfiles.initContainers }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.initContainers "context" $) | nindent 8 }}
+        {{- end }}
+      containers:
+        - name: grafana-pyroscope
+          image: {{ template "grafana-pyroscope.image" . }}
+          imagePullPolicy: {{ .Values.pyroscope.image.pullPolicy }}
+          {{- if .Values.adhocProfiles.containerSecurityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.adhocProfiles.containerSecurityContext "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.adhocProfiles.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.adhocProfiles.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.args "context" $) | nindent 12 }}
+          {{- else }}
+          args:
+            - -target=ad-hoc-profiles
+            - -config.file={{ .Values.pyroscope.dataDir }}/conf/pyroscope.yaml
+            {{- if or .Values.minio.enabled .Values.externalS3.host }}
+            - -storage.s3.access-key-id=$(S3_ACCESS_KEY_ID)
+            - -storage.s3.secret-access-key=$(S3_SECRET_ACCESS_KEY)
+            {{- end }}
+          {{- if .Values.adhocProfiles.extraArgs }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.extraArgs "context" $) | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          env:
+            {{- if or .Values.minio.enabled .Values.externalS3.host }}
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "grafana-pyroscope.s3.secretName" . }}
+                  key: {{ include "grafana-pyroscope.s3.accessKeyIDKey" . | quote }}
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "grafana-pyroscope.s3.secretName" . }}
+                  key: {{ include "grafana-pyroscope.s3.secretAccessKeyKey" . | quote }}
+            {{- end }}
+            {{- if .Values.adhocProfiles.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.adhocProfiles.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.adhocProfiles.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+          ports:
+            - containerPort: {{ .Values.pyroscope.containerPorts.http }}
+              name: http
+            - containerPort: {{ .Values.pyroscope.containerPorts.grpc }}
+              name: grpc
+            - containerPort: {{ .Values.pyroscope.containerPorts.gossipRing }}
+              name: http-memberlist
+            {{- if .Values.pyroscope.extraContainerPorts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.pyroscope.extraContainerPorts "context" $) | nindent 12 }}
+            {{- end }}
+          {{- if .Values.adhocProfiles.resources }}
+          resources: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.resources "context" $) | nindent 12 }}
+          {{- else if ne .Values.adhocProfiles.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.adhocProfiles.resourcesPreset) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.adhocProfiles.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.adhocProfiles.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.adhocProfiles.livenessProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: http
+          {{- end }}
+          {{- if .Values.adhocProfiles.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.adhocProfiles.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.adhocProfiles.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /ready
+              port: http
+          {{- end }}
+          {{- if .Values.adhocProfiles.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.adhocProfiles.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.adhocProfiles.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: http
+          {{- end }}
+          {{- if .Values.adhocProfiles.lifecycleHooks }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.lifecycleHooks "context" $) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+            - name: pyroscope-config
+              mountPath: {{ .Values.pyroscope.dataDir }}/conf/pyroscope.yaml
+              subPath: pyroscope.yaml
+          {{- if .Values.adhocProfiles.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+        {{- if .Values.adhocProfiles.sidecars }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.adhocProfiles.sidecars "context" $) | nindent 8 }}
+        {{- end }}
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: pyroscope-config
+          configMap:
+            name: {{ template "grafana-pyroscope.pyroscope.configmapName" . }}
+        {{- if .Values.adhocProfiles.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.adhocProfiles.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+{{- end }}

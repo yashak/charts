@@ -1,0 +1,57 @@
+pyroscope:
+  dataDir: /bitnami/grafana-pyroscope
+compactor:
+  service:
+    ports:
+      http: 3102
+      grpc: 4102
+distributor:
+  service:
+    ports:
+      http: 3103
+      grpc: 4103
+ingester:
+  service:
+    ports:
+      http: 3104
+      grpc: 4104
+storeGateway:
+  enabled: true
+  service:
+    ports:
+      http: 3104
+      grpc: 4105
+querier:
+  service:
+    type: LoadBalancer
+    ports:
+      http: 80
+      grpc: 4106
+queryFrontend:
+  enabled: true
+  service:
+    ports:
+      http: 3107
+      grpc: 4107
+queryScheduler:
+  enabled: true
+  service:
+    ports:
+      http: 3108
+      grpc: 4108
+tenantSettings:
+  enabled: true
+  service:
+    ports:
+      http: 3109
+      grpc: 4109
+adhocProfiles:
+  enabled: true
+  service:
+    ports:
+      http: 3110
+      grpc: 4110
+grafanaalloy:
+  enabled: true
+metrics:
+  enabled: true

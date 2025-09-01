@@ -1,0 +1,201 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if .Values.tenantSettings.enabled }}
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "grafana-pyroscope.tenant-settings.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: tenant-settings
+    pyroscope-gossip-member: "true"
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if not .Values.tenantSettings.autoscaling.hpa.enabled }}
+  replicas: {{ .Values.tenantSettings.replicaCount }}
+  {{- end }}
+  {{- if .Values.tenantSettings.updateStrategy }}
+  strategy: {{- toYaml .Values.tenantSettings.updateStrategy | nindent 4 }}
+  {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.tenantSettings.podLabels .Values.commonLabels ) "context" . ) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/part-of: grafana-pyroscope
+      app.kubernetes.io/component: tenant-settings
+      pyroscope-gossip-member: "true"
+  template:
+    metadata:
+      annotations:
+        {{- if not .Values.pyroscope.existingConfigmap }}
+        checksum/config: {{ include (print $.Template.BasePath "/pyroscope-configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.pyroscope.addProfileAnnotations }}
+        {{- include "grafana-pyroscope.profileAnnotations" . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.tenantSettings.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/part-of: grafana-pyroscope
+        app.kubernetes.io/component: tenant-settings
+        pyroscope-gossip-member: "true"
+    spec:
+      serviceAccountName: {{ template "grafana-pyroscope.serviceAccountName" . }}
+      {{- include "grafana-pyroscope.imagePullSecrets" . | nindent 6 }}
+      automountServiceAccountToken: {{ .Values.tenantSettings.automountServiceAccountToken }}
+      {{- if .Values.tenantSettings.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tenantSettings.affinity }}
+      affinity: {{- include "common.tplvalues.render" ( dict "value" .Values.tenantSettings.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.tenantSettings.podAffinityPreset "component" "tenant-settings" "customLabels" $podLabels "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.tenantSettings.podAntiAffinityPreset "component" "tenant-settings" "customLabels" $podLabels "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.tenantSettings.nodeAffinityPreset.type "key" .Values.tenantSettings.nodeAffinityPreset.key "values" .Values.tenantSettings.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.tenantSettings.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" ( dict "value" .Values.tenantSettings.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tenantSettings.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.tolerations "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tenantSettings.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tenantSettings.priorityClassName }}
+      priorityClassName: {{ .Values.tenantSettings.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.tenantSettings.schedulerName }}
+      schedulerName: {{ .Values.tenantSettings.schedulerName }}
+      {{- end }}
+      {{- if .Values.tenantSettings.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.tenantSettings.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      enableServiceLinks: {{ .Values.tenantSettings.enableServiceLinks }}
+      initContainers:
+        {{- if .Values.tenantSettings.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.initContainers "context" $) | nindent 8 }}
+        {{- end }}
+      containers:
+        - name: grafana-pyroscope
+          image: {{ template "grafana-pyroscope.image" . }}
+          imagePullPolicy: {{ .Values.pyroscope.image.pullPolicy }}
+          {{- if .Values.tenantSettings.containerSecurityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.tenantSettings.containerSecurityContext "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.tenantSettings.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.tenantSettings.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.args "context" $) | nindent 12 }}
+          {{- else }}
+          args:
+            - -target=tenant-settings
+            - -config.file={{ .Values.pyroscope.dataDir }}/conf/pyroscope.yaml
+            {{- if or .Values.minio.enabled .Values.externalS3.host }}
+            - -storage.s3.access-key-id=$(S3_ACCESS_KEY_ID)
+            - -storage.s3.secret-access-key=$(S3_SECRET_ACCESS_KEY)
+            {{- end }}
+          {{- if .Values.tenantSettings.extraArgs }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.extraArgs "context" $) | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          env:
+            {{- if or .Values.minio.enabled .Values.externalS3.host }}
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "grafana-pyroscope.s3.secretName" . }}
+                  key: {{ include "grafana-pyroscope.s3.accessKeyIDKey" . | quote }}
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "grafana-pyroscope.s3.secretName" . }}
+                  key: {{ include "grafana-pyroscope.s3.secretAccessKeyKey" . | quote }}
+            {{- end }}
+            {{- if .Values.tenantSettings.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.tenantSettings.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.tenantSettings.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.tenantSettings.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.tenantSettings.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+          ports:
+            - containerPort: {{ .Values.pyroscope.containerPorts.http }}
+              name: http
+            - containerPort: {{ .Values.pyroscope.containerPorts.gossipRing }}
+              name: http-memberlist
+            - containerPort: {{ .Values.pyroscope.containerPorts.grpc }}
+              name: grpc
+            {{- if .Values.pyroscope.extraContainerPorts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.pyroscope.extraContainerPorts "context" $) | nindent 12 }}
+            {{- end }}
+          {{- if .Values.tenantSettings.resources }}
+          resources: {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.resources "context" $) | nindent 12 }}
+          {{- else if ne .Values.tenantSettings.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.tenantSettings.resourcesPreset) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.tenantSettings.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.tenantSettings.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.tenantSettings.livenessProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: http
+          {{- end }}
+          {{- if .Values.tenantSettings.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.tenantSettings.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.tenantSettings.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /ready
+              port: http
+          {{- end }}
+          {{- if .Values.tenantSettings.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.tenantSettings.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.tenantSettings.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: http
+          {{- end }}
+          {{- if .Values.tenantSettings.lifecycleHooks }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.lifecycleHooks "context" $) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+            - name: pyroscope-config
+              mountPath: {{ .Values.pyroscope.dataDir }}/conf/pyroscope.yaml
+              subPath: pyroscope.yaml
+            - name: data
+              mountPath: {{ .Values.pyroscope.dataDir }}
+          {{- if .Values.tenantSettings.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+        {{- if .Values.tenantSettings.sidecars }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.tenantSettings.sidecars "context" $) | nindent 8 }}
+        {{- end }}
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: pyroscope-config
+          configMap:
+            name: {{ template "grafana-pyroscope.pyroscope.configmapName" . }}
+        - name: data
+          emptyDir: {}
+        {{- if .Values.tenantSettings.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.tenantSettings.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+{{- end }}

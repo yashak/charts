@@ -1,0 +1,43 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if and .Values.storeGateway.enabled .Values.storeGateway.autoscaling.hpa.enabled }}
+apiVersion: {{ include "common.capabilities.hpa.apiVersion" ( dict "context" $ ) }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "grafana-pyroscope.store-gateway.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: store-gateway
+  {{- if or .Values.commonAnnotations .Values.storeGateway.autoscaling.hpa.annotations }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.storeGateway.autoscaling.hpa.annotations .Values.commonAnnotations ) "context" . ) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+    kind: StatefulSet
+    name: {{ template "grafana-pyroscope.store-gateway.fullname" . }}
+  minReplicas: {{ .Values.storeGateway.autoscaling.hpa.minReplicas }}
+  maxReplicas: {{ .Values.storeGateway.autoscaling.hpa.maxReplicas }}
+  metrics:
+    {{- if .Values.storeGateway.autoscaling.hpa.targetCPU }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.storeGateway.autoscaling.hpa.targetCPU }}
+    {{- end }}
+    {{- if .Values.storeGateway.autoscaling.hpa.targetMemory }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.storeGateway.autoscaling.hpa.targetMemory }}
+    {{- end }}
+{{- end }}

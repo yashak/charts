@@ -1,0 +1,95 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if and .Values.compactor.enabled .Values.compactor.networkPolicy.enabled }}
+kind: NetworkPolicy
+apiVersion: {{ include "common.capabilities.networkPolicy.apiVersion" . }}
+metadata:
+  name: {{ template "grafana-pyroscope.compactor.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: compactor
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.compactor.podLabels .Values.commonLabels ) "context" . ) }}
+  podSelector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/part-of: grafana-pyroscope
+      app.kubernetes.io/component: compactor
+  policyTypes:
+    - Ingress
+    - Egress
+  {{- if .Values.compactor.networkPolicy.allowExternalEgress }}
+  egress:
+    - {}
+  {{- else }}
+  egress:
+    # Allow dns resolution
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # Allow outbound connections to pyroscope cluster
+    - ports:
+        - port: {{ .Values.pyroscope.containerPorts.http }}
+        - port: {{ .Values.pyroscope.containerPorts.gossipRing }}
+        - port: {{ .Values.pyroscope.containerPorts.grpc }}
+      to:
+        - podSelector:
+            matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 14 }}
+              app.kubernetes.io/part-of: grafana-pyroscope
+    {{- if and .Values.minio.enabled .Values.externalS3.host }}
+    # Allow outbound connections to S3
+    - ports:
+        - port: {{ include "grafana-pyroscope.s3.port" . }}
+      {{- if .Values.minio.enabled }}
+        - port: {{ .Values.minio.containerPorts.api }}
+      to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: minio
+              app.kubernetes.io/instance: {{ include "common.names.namespace" . }}
+        {{- end }}
+    {{- end }}
+    {{- if .Values.compactor.networkPolicy.extraEgress }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.compactor.networkPolicy.extraEgress "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+  ingress:
+    - ports:
+        - port: {{ .Values.pyroscope.containerPorts.http }}
+        - port: {{ .Values.pyroscope.containerPorts.gossipRing }}
+        - port: {{ .Values.pyroscope.containerPorts.grpc }}
+      {{- if not .Values.compactor.networkPolicy.allowExternal }}
+      from:
+        - podSelector:
+            matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 14 }}
+              app.kubernetes.io/part-of: grafana-pyroscope
+        {{- if .Values.compactor.networkPolicy.addExternalClientAccess }}
+        - podSelector:
+            matchLabels:
+              {{ template "grafana-pyroscope.compactor.fullname" . }}-client: "true"
+        {{- end }}
+        {{- if .Values.compactor.networkPolicy.ingressPodMatchLabels }}
+        - podSelector:
+            matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.compactor.networkPolicy.ingressPodMatchLabels "context" $ ) | nindent 14 }}
+        {{- end }}
+        {{- if .Values.compactor.networkPolicy.ingressNSMatchLabels }}
+        - namespaceSelector:
+            matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.compactor.networkPolicy.ingressNSMatchLabels "context" $ ) | nindent 14 }}
+          {{- if .Values.compactor.networkPolicy.ingressNSPodMatchLabels }}
+          podSelector:
+            matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.compactor.networkPolicy.ingressNSPodMatchLabels "context" $ ) | nindent 14 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- if .Values.compactor.networkPolicy.extraIngress }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.compactor.networkPolicy.extraIngress "context" $ ) | nindent 4 }}
+    {{- end }}
+{{- end }}

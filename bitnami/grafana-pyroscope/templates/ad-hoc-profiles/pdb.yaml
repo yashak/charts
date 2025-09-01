@@ -1,0 +1,30 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if and .Values.adhocProfiles.enabled .Values.adhocProfiles.pdb.create }}
+apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "grafana-pyroscope.ad-hoc-profiles.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: grafana-pyroscope
+    app.kubernetes.io/component: ad-hoc-profiles
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.adhocProfiles.pdb.minAvailable }}
+  minAvailable: {{ .Values.adhocProfiles.pdb.minAvailable }}
+  {{- end  }}
+  {{- if or .Values.adhocProfiles.pdb.maxUnavailable (not .Values.adhocProfiles.pdb.minAvailable) }}
+  maxUnavailable: {{ .Values.adhocProfiles.pdb.maxUnavailable | default 1 }}
+  {{- end  }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.adhocProfiles.podLabels .Values.commonLabels) "context" .) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/part-of: grafana-pyroscope
+      app.kubernetes.io/component: ad-hoc-profiles
+{{- end }}
