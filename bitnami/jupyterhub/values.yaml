@@ -82,9 +82,9 @@ hub:
   ## @param hub.image.pullSecrets Hub image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: bitnami/jupyterhub
-    tag: 5.3.0-debian-12-r15
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/jupyterhub
+    tag: 5.3.0-debian-12-r16
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -710,8 +710,8 @@ proxy:
   ## @param proxy.image.debug Activate verbose output
   ##
   image:
-    registry: docker.io
-    repository: bitnami/configurable-http-proxy
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/configurable-http-proxy
     tag: 5.0.1-debian-12-r21
     digest: ""
     ## Specify a imagePullPolicy
@@ -1587,9 +1587,9 @@ imagePuller:
 ##
 singleuser:
   image:
-    registry: docker.io
-    repository: bitnami/jupyter-base-notebook
-    tag: 5.3.0-debian-12-r10
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/jupyter-base-notebook
+    tag: 5.3.0-debian-12-r12
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -1826,9 +1826,9 @@ singleuser:
 ## @param auxiliaryImage.pullSecrets Auxiliary image pull secrets
 ##
 auxiliaryImage:
-  registry: docker.io
-  repository: bitnami/os-shell
-  tag: 12-debian-12-r50
+  registry: registry.app-catalog.vmware.com
+  repository: eam/prd/containers/verified/common/minideb-bookworm/os-shell
+  tag: 12-debian-12-r51
   digest: ""
   pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
