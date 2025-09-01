@@ -83,9 +83,9 @@ diagnosticMode:
 ## @param image.debug Enable SeaweedFS image debug mode
 ##
 image:
-  registry: docker.io
-  repository: bitnami/seaweedfs
-  tag: 3.96.0-debian-12-r2
+  registry: registry.app-catalog.vmware.com
+  repository: eam/prd/containers/verified/common/minideb-bookworm/seaweedfs
+  tag: 3.97.0-debian-12-r0
   digest: ""
   ## Specify a imagePullPolicy
   ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -3721,8 +3721,8 @@ volumePermissions:
   ## @param volumePermissions.image.pullSecrets OS Shell + Utility image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: bitnami/os-shell
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/os-shell
     tag: 12-debian-12-r51
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
@@ -3805,8 +3805,8 @@ mariadb:
   ## @param mariadb.image.pullSecrets Specify docker-registry secret names as an array
   ##
   image:
-    registry: docker.io
-    repository: bitnami/mariadb
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/mariadb
     tag: 12.0.2-debian-12-r0
     digest: ""
     ## Specify a imagePullPolicy
@@ -3904,8 +3904,8 @@ postgresql:
   ## @param postgresql.image.pullSecrets Specify image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: bitnami/postgresql
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/postgresql
     tag: 17.6.0-debian-12-r4
     digest: ""
     ## Specify a imagePullPolicy
