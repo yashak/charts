@@ -87,8 +87,8 @@ diagnosticMode:
 ## @param image.debug Enable image debug mode
 ##
 image:
-  registry: docker.io
-  repository: bitnami/consul
+  registry: registry.app-catalog.vmware.com
+  repository: eam/prd/containers/verified/common/minideb-bookworm/consul
   tag: 1.21.4-debian-12-r1
   digest: ""
   ## Specify a imagePullPolicy
@@ -724,9 +724,9 @@ volumePermissions:
   ## @param volumePermissions.image.pullSecrets OS Shell + Utility image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: bitnami/os-shell
-    tag: 12-debian-12-r50
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/os-shell
+    tag: 12-debian-12-r51
     digest: ""
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
@@ -773,8 +773,8 @@ metrics:
   ## @param metrics.image.pullSecrets HashiCorp Consul Prometheus Exporter image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: bitnami/consul-exporter
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/consul-exporter
     tag: 0.13.0-debian-12-r29
     digest: ""
     pullPolicy: IfNotPresent
