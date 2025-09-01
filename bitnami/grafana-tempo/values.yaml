@@ -86,8 +86,8 @@ tempo:
   ## @param tempo.image.pullSecrets Grafana Tempo image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: bitnami/grafana-tempo
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/grafana-tempo
     tag: 2.8.2-debian-12-r1
     digest: ""
     ## Specify a imagePullPolicy
@@ -2486,9 +2486,9 @@ queryFrontend:
     ## @param queryFrontend.query.image.pullSecrets Grafana Tempo Query image pull secrets
     ##
     image:
-      registry: docker.io
-      repository: bitnami/grafana-tempo-query
-      tag: 2.8.2-debian-12-r1
+      registry: registry.app-catalog.vmware.com
+      repository: eam/prd/containers/verified/common/minideb-bookworm/grafana-tempo-query
+      tag: 2.8.2-debian-12-r2
       digest: ""
       ## Specify a imagePullPolicy
       ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -2787,8 +2787,8 @@ vulture:
   ## @param vulture.image.pullSecrets Grafana Vulture image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: bitnami/grafana-tempo-vulture
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/grafana-tempo-vulture
     tag: 2.8.2-debian-12-r1
     digest: ""
     ## Specify a imagePullPolicy
@@ -3195,9 +3195,9 @@ volumePermissions:
   ## @param volumePermissions.image.pullSecrets OS Shell + Utility image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: bitnami/os-shell
-    tag: 12-debian-12-r50
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/os-shell
+    tag: 12-debian-12-r51
     digest: ""
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
