@@ -93,9 +93,9 @@ server:
   ## @param server.image.debug Enable Vault Server image debug mode
   ##
   image:
-    registry: docker.io
-    repository: bitnami/vault
-    tag: 1.20.2-debian-12-r2
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/vault
+    tag: 1.20.3-debian-12-r0
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: http://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -907,8 +907,8 @@ csiProvider:
   ## @param csiProvider.image.debug Enable Vault CSI Provider image debug mode
   ##
   image:
-    registry: docker.io
-    repository: bitnami/vault-csi-provider
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/vault-csi-provider
     tag: 1.5.1-debian-12-r4
     digest: ""
     ## Specify a imagePullPolicy
@@ -1411,8 +1411,8 @@ injector:
   ## @param injector.image.debug Enable Vault Kubernetes Injector image debug mode
   ##
   image:
-    registry: docker.io
-    repository: bitnami/vault-k8s
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/vault-k8s
     tag: 1.7.0-debian-12-r4
     digest: ""
     ## Specify a imagePullPolicy
@@ -1878,9 +1878,9 @@ volumePermissions:
   ## @param volumePermissions.image.pullSecrets OS Shell + Utility image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: bitnami/os-shell
-    tag: 12-debian-12-r50
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/os-shell
+    tag: 12-debian-12-r51
     digest: ""
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
