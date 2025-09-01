@@ -1,0 +1,92 @@
+auth:
+  accessKeyID: vib_key
+  secretAccessKey: ComplicatedPassword123!4
+podSecurityContext:
+  fsGroup: 1002
+containerSecurityContext:
+  runAsUser: 1002
+containerPorts:
+  http: 7777
+overrideConfiguration:
+  VGW_META_NONE: "false"
+secretOverrideConfiguration:
+  VGW_DISABLE_OTMP: "false"
+service:
+  ports:
+    http: 80
+  type: LoadBalancer
+persistence:
+  enabled: true
+  mountPath: /vib/versitygw
+extraVolumes:
+  - name: tmp
+    emptyDir: {}
+extraVolumeMounts:
+  - name: tmp
+    mountPath: /tmp
+extraDeploy:
+# Deploy a job with aws-cli that creates a bucket and pushes one file
+  - |
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: vib-aws-credentials
+    type: Opaque
+    stringData:
+      access_key: {{ .Values.auth.accessKeyID }}
+      secret_key: {{ .Values.auth.secretAccessKey }}
+  - |
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: vib-aws-cli
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: bucket-creator
+              image: docker.io/bitnami/aws-cli:latest
+              command:
+              - bash
+              args:
+              - -ec
+              - |
+                retry_while() {
+                    local cmd="${1:?cmd is missing}"
+                    local return_value=1
+
+                    read -r -a command <<<"$cmd"
+                    for ((i = 1; i <= 12; i += 1)); do
+                        "${command[@]}" && return_value=0 && break
+                        sleep 5
+                    done
+                    return $return_value
+                }
+                if ! retry_while "aws --endpoint-url http://versitygw:{{ .Values.service.ports.http }} --region us-east-1 s3 ls"; then
+                    echo "Error connecting to S3"
+                    exit 1
+                fi
+                aws --endpoint-url http://versitygw:{{ .Values.service.ports.http }} --region us-east-1 s3 mb s3://vibbucket
+                echo "IT WORKS" > /tmp/vibfile
+                aws --endpoint-url http://versitygw:{{ .Values.service.ports.http }} --region us-east-1 s3 cp /tmp/vibfile s3://vibbucket/
+                echo "Bucket creation and file upload correct"
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: vib-aws-credentials
+                      key: access_key
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: vib-aws-credentials
+                      key: secret_key
+              securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.containerSecurityContext "context" $) | nindent 12 }}
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
+                  subPath: tmp-dir
+          volumes:
+            - name: tmp
+              emptyDir: {}

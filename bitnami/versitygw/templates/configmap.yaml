@@ -1,0 +1,45 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{/* Adding the helper in configmap.yaml for better readability */}}
+{{- define "versitygw.config.default" -}}
+{{/* Common configuration */}}
+{{- if ne .Values.backend "other" }}
+{{/* When setting "other" the user must explictly set it in the configOverrides variable. This is for covering all possible new backends */}}
+VGW_BACKEND: {{ .Values.backend }}
+{{- end }}
+VGW_HEALTH: /health
+VGW_ACCESS_LOG: /dev/stdout
+VGW_PORT: 0.0.0.0:{{ .Values.containerPorts.http }}
+{{/* POSIX Specific args */}}
+{{- if eq .Values.backend "posix" }}
+VGW_BACKEND_ARGS: {{ .Values.persistence.mountPath }}
+{{- end }}
+{{/* TLS Args */}}
+{{- if .Values.tls.enabled }}
+VGW_CERT: /certs/{{ .Values.tls.certFilename }}
+VGW_KEY: /certs/{{ .Values.tls.certKeyFilename }}
+{{- end }}
+{{- end }}
+
+{{- if (not .Values.existingConfigMap) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: versitygw
+    app.kubernetes.io/component: versitygw
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+{{- $defaultConfiguration := include "versitygw.config.default" . | fromYaml -}}
+{{- $overrideConfiguration := include "common.tplvalues.render" (dict "value" .Values.overrideConfiguration "context" $) | fromYaml -}}
+
+{{/* Merge both maps and render the list of env vars */}}
+{{- mergeOverwrite $defaultConfiguration $overrideConfiguration | toYaml | nindent 2 }}
+{{- end }}

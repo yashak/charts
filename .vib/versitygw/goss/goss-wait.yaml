@@ -1,0 +1,7 @@
+# Copyright Broadcom, Inc. All Rights Reserved.
+# SPDX-License-Identifier: APACHE-2.0
+
+file:
+  # Check that the aws job has pushed the file in the bucket
+  {{ .Vars.persistence.mountPath }}/vibbucket/vibfile:
+    exists: true
