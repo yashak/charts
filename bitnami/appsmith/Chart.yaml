@@ -6,7 +6,7 @@ annotations:
     - name: appsmith
       image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/appsmith:1.85.0-debian-12-r0
     - name: haproxy
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/haproxy:3.2.4-debian-12-r0
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/haproxy:3.2.4-debian-12-r1
     - name: os-shell
       image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/os-shell:12-debian-12-r51
   licenses: Apache-2.0
@@ -40,4 +40,4 @@ maintainers:
 name: appsmith
 sources:
 - https://github.com/bitnami/charts/tree/main/bitnami/appsmith
-version: 7.0.5
+version: 7.0.6
