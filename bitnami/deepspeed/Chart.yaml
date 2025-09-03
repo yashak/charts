@@ -6,7 +6,7 @@ annotations:
     - name: deepspeed
       image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/deepspeed:0.17.5-debian-12-r0
     - name: git
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/git:2.51.0-debian-12-r0
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/git:2.51.0-debian-12-r1
     - name: os-shell
       image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/os-shell:12-debian-12-r51
   licenses: Apache-2.0
@@ -37,4 +37,4 @@ name: deepspeed
 sources:
 - https://github.com/bitnami/charts/tree/main/bitnami/deepspeed
 - https://github.com/bitnami/charts/tree/main/bitnami/pytorch
-version: 2.3.52
+version: 2.3.53
