@@ -4,7 +4,7 @@
 annotations:
   images: |
     - name: apache-exporter
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/apache-exporter:1.0.10-debian-12-r55
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/apache-exporter:1.0.10-debian-12-r56
     - name: os-shell
       image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/os-shell:12-debian-12-r51
     - name: wordpress
@@ -46,4 +46,4 @@ maintainers:
 name: wordpress
 sources:
 - https://github.com/bitnami/charts/tree/main/bitnami/wordpress
-version: 27.0.1
+version: 27.0.2
