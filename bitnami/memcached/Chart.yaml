@@ -6,7 +6,7 @@ annotations:
     - name: memcached
       image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/memcached:1.6.39-debian-12-r1
     - name: memcached-exporter
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/memcached-exporter:0.15.3-debian-12-r5
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/memcached-exporter:0.15.3-debian-12-r6
     - name: os-shell
       image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/os-shell:12-debian-12-r51
   licenses: Apache-2.0
@@ -33,4 +33,4 @@ maintainers:
 name: memcached
 sources:
 - https://github.com/bitnami/charts/tree/main/bitnami/memcached
-version: 8.0.1
+version: 8.0.2
