@@ -9,7 +9,7 @@ annotations:
     - name: mariadb-min
       image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/mariadb-min:12.0.2-debian-12-r0
     - name: mysqld-exporter
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/mysqld-exporter:0.17.2-debian-12-r16
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/mysqld-exporter:0.17.2-debian-12-r17
     - name: os-shell
       image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/os-shell:12-debian-12-r51
   licenses: Apache-2.0
@@ -39,4 +39,4 @@ maintainers:
 name: mariadb-min
 sources:
 - https://github.com/bitnami/charts-private/tree/main/bitnami/mariadb-min
-version: 2.0.1
+version: 2.0.2
