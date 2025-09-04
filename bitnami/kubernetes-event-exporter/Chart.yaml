@@ -4,7 +4,7 @@
 annotations:
   images: |
     - name: kubernetes-event-exporter
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/kubernetes-event-exporter:1.7.0-debian-12-r46
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/kubernetes-event-exporter:1.7.0-debian-12-r47
   licenses: Apache-2.0
   tanzuCategory: clusterUtility
 apiVersion: v2
@@ -32,4 +32,4 @@ maintainers:
 name: kubernetes-event-exporter
 sources:
 - https://github.com/bitnami/charts/tree/main/bitnami/kubernetes-event-exporter
-version: 3.6.5
+version: 3.6.6
