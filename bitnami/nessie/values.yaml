@@ -124,7 +124,7 @@ javaOpts: ""
 image:
   registry: registry.app-catalog.vmware.com
   repository: eam/prd/containers/verified/common/minideb-bookworm/nessie
-  tag: 0.105.0-debian-12-r0
+  tag: 0.105.0-debian-12-r1
   digest: ""
   ## Specify a imagePullPolicy
   ## ref: http://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -752,7 +752,7 @@ volumePermissions:
   image:
     registry: registry.app-catalog.vmware.com
     repository: eam/prd/containers/verified/common/minideb-bookworm/os-shell
-    tag: 12-debian-12-r51
+    tag: 12-debian-12-r52
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -807,7 +807,7 @@ waitContainer:
   image:
     registry: registry.app-catalog.vmware.com
     repository: eam/prd/containers/verified/common/minideb-bookworm/postgresql
-    tag: 17.6.0-debian-12-r5
+    tag: 17.6.0-debian-12-r7
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
