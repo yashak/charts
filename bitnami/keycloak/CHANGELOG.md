@@ -1,10 +1,14 @@
 # Changelog
 
-## 25.2.3 (2025-09-08)
+## 25.2.4 (2025-09-11)
+
+[bitnami/keycloak]: fix sidecars in keycloak-config-cli-job ([#36247](https://github.com/bitnami/charts/pull/36247))
+
+## <small>25.2.3 (2025-09-08)</small>
 
 * [bitnami/keycloak] fix: consider httpRelativePath for metrics ([#36219](https://github.com/bitnami/charts/pull/36219))
 
-## 25.2.0 (2025-08-21)
+## <small>25.2.0 (2025-08-21)</small>
 
 * [bitnami/keycloak] Add externalDatabase.extraParams for custom JDBC connection parameters (#35770) ([d7ec0ea](https://github.com/bitnami/charts/commit/d7ec0ea7bff7264df7068ec6e51fbd3493d2c890)), closes [#35770](https://github.com/bitnami/charts/issues/35770)
 
