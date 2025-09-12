@@ -1,6 +1,9 @@
 # Changelog
 
-## 22.0.7 (2025-08-27)
+## 23.0.7 (2025-08-27)
+* [bitnami/redis] Fix service binding password mismatch (#15626) ([#36231](https://github.com/bitnami/charts/pull/36231))
+
+## <small> 22.0.7 (2025-08-27)</small>
 
 * [bitnami/redis] Fix Redis sentinel initialization with single replica ([#35667](https://github.com/bitnami/charts/pull/35667))
 
