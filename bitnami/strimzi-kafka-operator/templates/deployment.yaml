@@ -88,8 +88,11 @@ spec:
           {{- if .Values.command }}
           command: {{- include "common.tplvalues.render" (dict "value" .Values.command "context" .) | nindent 12 }}
           {{- end }}
+          args:
           {{- if .Values.args }}
-          args: {{- include "common.tplvalues.render" (dict "value" .Values.args "context" .) | nindent 12 }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.args "context" .) | nindent 12 }}
+          {{- else }}
+            - /opt/bitnami/strimzi-kafka-operator/bin/cluster_operator_run.sh
           {{- end }}
           env:
             - name: STRIMZI_NAMESPACE
