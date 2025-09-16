@@ -49,7 +49,7 @@
             "vars_file": "telegraf/runtime-parameters.yaml",
             "remote": {
               "pod": {
-                "workload": "deploy-cadvisor"
+                "workload": "deploy-telegraf"
               }
             }
           }
