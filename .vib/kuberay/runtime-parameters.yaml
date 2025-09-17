@@ -38,8 +38,7 @@ apiserver:
 
 cluster:
   enabled: true
-  service:
-    type: ClusterIP
+  serviceType: ClusterIP
   worker:
     groupSpecs:
       - groupName: vib
@@ -55,6 +54,8 @@ extraDeploy:
       name: kuberay-cluster-head-vib-svc
       labels:
         app.kubernetes.io/component: cluster-head
+      annotations:
+        networking.gke.io/load-balancer-type: Internal
     spec:
       type: LoadBalancer
       selector:
