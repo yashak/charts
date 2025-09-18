@@ -112,22 +112,24 @@ data:
             <server>
                 <certificateFile>/opt/bitnami/clickhouse/certs/server/tls.crt</certificateFile>
                 <privateKeyFile>/opt/bitnami/clickhouse/certs/server/tls.key</privateKeyFile>
-                <caConfig>/opt/bitnami/clickhouse/certs/ca/tls.crt</caConfig>
                 <cacheSessions>true</cacheSessions>
                 <disableProtocols>sslv2,sslv3</disableProtocols>
                 <preferServerCiphers>true</preferServerCiphers>
+                <caConfig>/opt/bitnami/clickhouse/certs/ca/tls.crt</caConfig>
                 <verificationMode>relaxed</verificationMode>
             </server>
             <client>
                 <loadDefaultCAFile>false</loadDefaultCAFile>
-                <caConfig>/opt/bitnami/clickhouse/certs/ca/tls.crt</caConfig>
                 <cacheSessions>true</cacheSessions>
                 <disableProtocols>sslv2,sslv3</disableProtocols>
                 <preferServerCiphers>true</preferServerCiphers>
-                <verificationMode>relaxed</verificationMode>
                 <invalidCertificateHandler>
                     <name>AcceptCertificateHandler</name>
                 </invalidCertificateHandler>
+  {{- if .Values.tls.mTLS }}
+                <caConfig>/opt/bitnami/clickhouse/certs/ca/tls.crt</caConfig>
+                <verificationMode>relaxed</verificationMode>
+  {{- end }}
             </client>
         </openSSL>
     </yandex>
