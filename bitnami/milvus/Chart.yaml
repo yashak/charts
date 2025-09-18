@@ -4,17 +4,21 @@
 annotations:
   images: |
     - name: attu
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/attu:2.5.12-debian-12-r20
+      version: 2.5.12
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/attu:2.5.12-debian-12-r21
     - name: milvus
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/milvus:2.6.1-debian-12-r1
+      version: 2.6.2
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/milvus:2.6.2-debian-12-r0
     - name: os-shell
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/os-shell:12-debian-12-r51
+      version: "12"
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/os-shell:12-debian-12-r52
     - name: pymilvus
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/pymilvus:2.6.1-debian-12-r0
+      version: 2.6.1
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/pymilvus:2.6.1-debian-12-r1
   licenses: Apache-2.0
   tanzuCategory: service
 apiVersion: v2
-appVersion: 2.6.1
+appVersion: 2.6.2
 dependencies:
 - condition: etcd.enabled
   name: etcd
@@ -50,4 +54,4 @@ maintainers:
 name: milvus
 sources:
 - https://github.com/bitnami/charts/tree/main/bitnami/milvus
-version: 16.0.4
+version: 16.0.5
