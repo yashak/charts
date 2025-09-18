@@ -4,15 +4,18 @@
 annotations:
   images: |
     - name: grafana-k6
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/grafana-k6:1.2.3-debian-12-r1
+      version: 1.2.3
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/grafana-k6:1.2.3-debian-12-r2
     - name: grafana-k6-operator
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/grafana-k6-operator:0.0.23-debian-12-r2
+      version: 1.0.0
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/grafana-k6-operator:1.0.0-debian-12-r0
     - name: os-shell
-      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/os-shell:12-debian-12-r51
+      version: "12"
+      image: registry.app-catalog.vmware.com/eam/prd/containers/verified/common/minideb-bookworm/os-shell:12-debian-12-r52
   licenses: Apache-2.0
   tanzuCategory: service
 apiVersion: v2
-appVersion: 0.0.23
+appVersion: 1.0.0
 dependencies:
 - name: common
   repository: oci://registry-1.docker.io/bitnamicharts
@@ -34,4 +37,4 @@ maintainers:
 name: grafana-k6-operator
 sources:
 - https://github.com/bitnami/charts/tree/main/bitnami/grafana-k6-operator
-version: 1.0.15
+version: 2.0.0
