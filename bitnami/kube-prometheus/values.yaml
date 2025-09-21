@@ -78,7 +78,7 @@ operator:
   image:
     registry: registry.app-catalog.vmware.com
     repository: eam/prd/containers/verified/common/minideb-bookworm/prometheus-operator
-    tag: 0.85.0-debian-12-r1
+    tag: 0.85.0-debian-12-r2
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -638,7 +638,7 @@ prometheus:
   image:
     registry: registry.app-catalog.vmware.com
     repository: eam/prd/containers/verified/common/minideb-bookworm/prometheus
-    tag: 3.5.0-debian-12-r4
+    tag: 3.6.0-debian-12-r0
     digest: ""
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
@@ -1898,7 +1898,7 @@ alertmanager:
   image:
     registry: registry.app-catalog.vmware.com
     repository: eam/prd/containers/verified/common/minideb-bookworm/alertmanager
-    tag: 0.28.1-debian-12-r16
+    tag: 0.28.1-debian-12-r17
     digest: ""
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
@@ -2587,7 +2587,7 @@ blackboxExporter:
   image:
     registry: registry.app-catalog.vmware.com
     repository: eam/prd/containers/verified/common/minideb-bookworm/blackbox-exporter
-    tag: 0.27.0-debian-12-r5
+    tag: 0.27.0-debian-12-r6
     digest: ""
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
