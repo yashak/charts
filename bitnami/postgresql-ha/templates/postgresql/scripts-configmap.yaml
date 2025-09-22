@@ -21,10 +21,6 @@ data:
     set -o pipefail
     set -o nounset
 
-    # Debug section
-    exec 3>&1
-    exec 4>&2
-
     # Process input parameters
     MIN_DELAY_AFTER_PG_STOP_SECONDS=$1
 
@@ -51,11 +47,6 @@ data:
     }
 
     export MODULE="pre-stop-hook"
-    if ! is_boolean_yes "$BITNAMI_DEBUG"; then
-        exec 1>/dev/null
-        exec 2>/dev/null
-    fi
-
     postgresql_enable_nss_wrapper
 
     # Prepare env vars for managing roles
@@ -81,6 +72,8 @@ data:
         info "Waiting additional $WAIT_TO_PG_POOL_TIME seconds for Pgpool-II to detect node is down"
         sleep $WAIT_TO_PG_POOL_TIME
     fi
+
+    info "Pre-stop hook finished"
   liveness-probe.sh: |-
     #!/bin/bash
 
