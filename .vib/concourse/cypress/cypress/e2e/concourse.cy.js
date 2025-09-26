@@ -13,6 +13,7 @@ it('renders landing page correctly', () => {
 
   // The UI is just an alternative to the CLI to interact with Concourse. Main functionality
   // is already covered in GOSS, so these tests should be kept to a minimum.
+  cy.wait(5000);
   cy.visit('/');
   cy.contains('welcome to concourse');
 });
