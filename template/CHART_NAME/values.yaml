@@ -89,8 +89,8 @@ diagnosticMode:
   ## @param %%MAIN_OBJECT_BLOCK%%.image.debug Enable %%MAIN_CONTAINER%% image debug mode
   ##
   image:
-    registry: docker.io
-    repository: bitnami/%%IMAGE_NAME%%
+    registry: registry.app-catalog.vmware.com
+    repository: eam/prd/containers/verified/common/minideb-bookworm/%%IMAGE_NAME%%
     tag: %%IMAGE_TAG%%
     digest: ""
     ## Specify a imagePullPolicy
@@ -742,8 +742,8 @@ defaultInitContainers:
     ## @param defaultInitContainers.volumePermissions.image.pullSecrets "volume-permissions" init-containers' image pull secrets
     ##
     image:
-      registry: docker.io
-      repository: bitnami/os-shell
+      registry: registry.app-catalog.vmware.com
+      repository: eam/prd/containers/verified/common/minideb-bookworm/os-shell
       tag: 12-debian-12-r46
       digest: ""
       pullPolicy: IfNotPresent
@@ -831,10 +831,10 @@ serviceAccount:
   ## If not set and create is true, a name is generated using the common.names.fullname template
   ##
   name: ""
-  ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+  ## @param serviceAccount.annotations Additional ServiceAccount annotations (evaluated as a template)
   ##
   annotations: {}
-  ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+  ## @param serviceAccount.automountServiceAccountToken Whether pods running as this ServiceAccount should have an API token automatically mounted
   ##
   automountServiceAccountToken: true
 
