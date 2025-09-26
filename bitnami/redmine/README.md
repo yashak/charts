@@ -598,6 +598,10 @@ Find more information about how to deal with common errors related to Bitnami's 
 
 ## Upgrading
 
+### To 35.0.0
+
+This major updates the PostgreSQL subchart to its newest major, 18.0.0. Follow the [official instructions](https://www.postgresql.org/docs/18/upgrading.html) to upgrade to 18.x.
+
 ### To 34.0.0
 
 This major release bumps the MariaDB version to 12.0. Follow the [upstream instructions](https://mariadb.com/docs/server/server-management/install-and-upgrade-mariadb/upgrading) for upgrading from MariaDB 11.8 to 12.0. No major issues are expected during the upgrade.

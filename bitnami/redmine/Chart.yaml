@@ -17,7 +17,7 @@ dependencies:
 - condition: postgresql.enabled
   name: postgresql
   repository: oci://registry.app-catalog.vmware.com/eam/prd/charts/verified/common/minideb-bookworm
-  version: 16.x.x
+  version: 18.x.x
 - condition: mariadb.enabled
   name: mariadb
   repository: oci://registry.app-catalog.vmware.com/eam/prd/charts/verified/common/minideb-bookworm
@@ -47,4 +47,4 @@ maintainers:
 name: redmine
 sources:
 - https://github.com/bitnami/charts/tree/main/bitnami/redmine
-version: 34.0.5
+version: 35.0.0
