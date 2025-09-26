@@ -125,7 +125,7 @@ spec:
           {{- else }}
           args:
             - "--config.file=/opt/bitnami/alertmanager/conf/{{ include "prometheus.alertmanager.configmapKey" . }}"
-            - "--storage.path=/opt/bitnami/alertmanager/data"
+            - "--storage.path={{ .Values.alertmanager.persistence.mountPath }}"
             - "--web.listen-address=0.0.0.0:{{ .Values.alertmanager.containerPorts.http }}"
             {{- if gt (int .Values.alertmanager.replicaCount) 1 }}
             - "--cluster.advertise-address=[$(POD_IP)]:{{ $clusterPort }}"
